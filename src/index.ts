@@ -6,11 +6,17 @@ import {
   getContacs,
   getMessagesGroup,
 } from "./routeHandlers";
+import contactRouter from "./domain/contacts/contacts.routes";
+import messageRouter from "./domain/messages/messages.routes";
 
 io.on("connection", () => {
   io.emit("status", status);
 });
 
+
+
+app.use("/api/contacts", contactRouter);
+app.use("/api/messages", messageRouter);
 app.get("/", (req, res) => res.send("Hello World!"));
 app.get("/api/status", indexRouteHandler);
 app.get("/api/messages", getMessages);
