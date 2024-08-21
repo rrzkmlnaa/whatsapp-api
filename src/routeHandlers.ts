@@ -4,7 +4,7 @@ import { formatTimestampToAsiaJakarta } from "./helper";
 
 interface QueryParams {
   phoneNumber?: string;
-  limit?: string; // Since query parameters are always strings, limit should be typed as string
+  limit?: string;
 }
 
 export const indexRouteHandler: RequestHandler = (req, res) => {
