@@ -18,3 +18,8 @@ export function formatTimestampToAsiaJakarta(timestamp: number): string {
   const formatter = new Intl.DateTimeFormat("id-ID", options);
   return formatter.format(date);
 }
+
+export function extractPhoneNumber(contactId: string): string {
+  // Use split to divide the string by the '@' character and return the first part
+  return contactId.split("@")[0];
+}

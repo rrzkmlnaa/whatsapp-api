@@ -2,29 +2,42 @@ import { Request, Response } from "express";
 import { client } from "../../wa";
 import { db } from "../../config/database/database";
 import { contacts } from "./contacts.schema";
+import { eq } from "drizzle-orm";
 
 export class ContactsController {
   static async getContacts(_req: Request, res: Response) {
-    try {
-      const contactData = await db.query.contacts.findMany();
+    const { phoneNumber } = _req.query;
 
-      console.log(contactData)
+    const phoneNumberString =
+      typeof phoneNumber === "string" ? phoneNumber : "";
+
+    try {
+      let contactData;
+
+      if (phoneNumberString) {
+        // Fetch labels that match the given phoneNumberString
+        contactData = await db.query.contacts.findMany({
+          where: eq(contacts.number, phoneNumberString),
+        });
+      } else {
+        // Fetch all labels if labelId is not provided
+        contactData = await db.query.contacts.findMany();
+      }
 
       if (contactData.length === 0) {
-       res.status(404).json({ message: "No contacts found" });
+        return res.status(404).json({ message: "No Labels found" });
       }
 
       return res.status(200).json(contactData);
     } catch (error) {
-      console.error("Error fetching contacts:", error);
-      res.status(500).send("Failed to fetch contacts");
+      console.error("Error fetching Labels:", error);
+      return res.status(500).send("Failed to fetch Labels");
     }
   }
 
   static async initContacts(_req: Request, res: Response) {
     try {
       const contactData = await client.getContacts();
-      console.log("Contacts fetched:", contactData);
 
       if (contactData.length === 0) {
         return { message: "No contacts found" };
@@ -39,7 +52,7 @@ export class ContactsController {
         (contact) => contact.server === "c.us"
       );
       if (formattedContacts.length === 0) {
-       res.status(404).json({ message: "No contacts found" });
+        res.status(404).json({ message: "No contacts found" });
       }
 
       await db.insert(contacts).values(formattedContacts);
